@@ -1,8 +1,58 @@
 ## Introduction
 
-libencoding aims to provide a generic and extensible encoding conversion library.
+libencoding aims to provide a generic and extensible encoding conversion library. It's main component
+is the `converter<> class template` which perform the conversion from an input encoding to an output
+encoding. It is declare as follow:
+
+```c++
+    template <
+        class FromCharT,
+        class FromEncoding,
+        class ToCharT,
+        class ToEncoding
+    > struct converter;
+```
+
+Instance of this function object provide an `operator()` that accept an input iterator range
+`[first, last)` of character type for the input encoding and an output iterator where character type
+for the output encoding will be placed.
+
+```c++
+    using namespace encoding;
+    
+    converter<char, utf8, std::uint32_t, utf32> conv;
+    
+    const char utf8_buffer[] = u8"Lorem ipsum";
+    std::vector<std::uint32_t> utf32_buffer;
+    
+    conv(std::begin(utf8_buffer), std::end(utf8_buffer), std::back_inserter(utf32_buffer));
+```
+
+Since the conversion of a string literal is a common task and tedious to write, an overload is
+provide which replace the input iterator range is replace by a `const from_char_type (&)[N]`
+parameter. So the above example could have been simply write:
+
+```c++
+    conv(u8"Lorem ipsum", std::back_inserter(utf32_buffer));
+```
+
+The default behaviour is to throw an exception if an error occure or if the operation result in a
+partial conversion. For a fine grain error handling, an overload is provide with a `std::error_code&`
+parameter where the corresponding error code will be place.
 
 ## Motivation and Scope
+
+I am working on this library for two main purpose:
+- Learning about unicode encoding and libary design.
+- Try to get a simple libary that offer many possibilities for modern C++ development.
+
+### The possibility to add a new encoding easily
+
+### The possibility to optimize selected conversions
+
+### The possibility to write generic code independant of the encoding
+
+### The possibility to use modern and standard practices
 
 ## Design Decisions
 
@@ -63,8 +113,12 @@ namespace encoding
     {
     };
 
-    template<class FromCharT, class FromEncoding, class ToCharT, class ToEncoding>
-    struct converter
+    template <
+        class FromCharT,
+        class FromEncoding,
+        class ToCharT,
+        class ToEncoding
+    > struct converter
     {
         typedef FromCharT    from_char_type;
         typedef FromEncoding from_encoding;
