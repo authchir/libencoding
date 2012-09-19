@@ -1,7 +1,7 @@
 ## Introduction
 
 libencoding aims to provide a generic and extensible encoding conversion library. It's main component
-is the `converter<> class template` which perform the conversion from an input encoding to an output
+is the `converter<>` class template which perform the conversion from an input encoding to an output
 encoding. It is declare as follow:
 
 ```c++
