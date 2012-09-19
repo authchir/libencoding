@@ -40,6 +40,10 @@ The default behaviour is to throw an exception if an error occure or if the oper
 partial conversion. For a fine grain error handling, an overload is provide with a `std::error_code&`
 parameter where the corresponding error code will be place.
 
+## Current status
+
+The library is presently under construction.
+
 ## Motivation and Scope
 
 I am working on this library with two main purpose:
