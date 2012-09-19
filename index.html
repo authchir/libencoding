@@ -70,20 +70,53 @@ parameter. So the above example could have been simply write:</p>
 partial conversion. For a fine grain error handling, an overload is provide with a <code>std::error_code&amp;</code>
 parameter where the corresponding error code will be place.</p>
 
+<h2>Current status</h2>
+
+<p>The library is presently under construction.</p>
+
 <h2>Motivation and Scope</h2>
 
-<p>I am working on this library for two main purpose:</p>
+<p>I am working on this library with two main purpose:</p>
 
 <ul>
-<li>Learning about unicode encoding and libary design.</li>
+<li>Learn about unicode encoding and libary design.</li>
 <li>Try to get a simple libary that offer many possibilities for modern C++ development.</li>
 </ul><h3>The possibility to add a new encoding easily</h3>
 
+<p>To add a new encoding, let's say <code>iso_8859_1</code>, one simply need to provide specializations of the
+<code>converter&lt;&gt;</code> class from and to UTF-32. Other encoding will use those conversion to implement all
+other combinations.</p>
+
 <h3>The possibility to optimize selected conversions</h3>
+
+<p>The only requires conversion are from and to UTF-32, but one can decide to specialize other conversion
+to avoid the overhead of using UTF-32 as a buffer encoding. Thus, if the conversion from ISO 8859-1 to
+UTF-16 is a frequent operation, is worth specialize <code>converter&lt;FromCharT, iso_8859_1, ToCharT, utf16&gt;</code>
+to performe the direct conversion.</p>
 
 <h3>The possibility to write generic code independant of the encoding</h3>
 
+<p>If the encoding can be encode as a type and that we can choose the right conversion algorithm, it
+become possible to write encoding independant classes such as <code>basic_string&lt;CharT, Encoding&gt;</code>,
+<code>basic_istream&lt;CharT, Encoding&gt;</code> and <code>basic_ostream&lt;CharT, Encoding&gt;</code> and use them interchangeably,
+letting an automatic conversion mechanism handle character and encoding differences.</p>
+
+<div class="highlight"><pre>    <span class="k">using</span> <span class="k">namespace</span> <span class="n">encoding</span><span class="p">;</span>
+
+    <span class="n">basic_ostream</span><span class="o">&lt;</span><span class="kt">char</span><span class="p">,</span> <span class="n">utf8</span><span class="o">&gt;&amp;</span> <span class="n">out</span> <span class="o">=</span> <span class="n">get_ostream</span><span class="p">();</span>
+    <span class="n">basic_string</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">uint32_t</span><span class="p">,</span> <span class="n">utf32</span><span class="o">&gt;</span> <span class="n">str</span> <span class="o">=</span> <span class="n">U</span><span class="s">"Lorem ipsum"</span><span class="p">;</span>
+
+    <span class="n">out</span> <span class="o">&lt;&lt;</span> <span class="n">str</span><span class="p">;</span> <span class="c1">// automatic conversion from UTF-32 to UTF-8</span>
+</pre></div>
+
 <h3>The possibility to use modern and standard practices</h3>
+
+<p>The library massively use template to enable as much interoperability as possible: character type
+is a template, encoding is represent as a tag template, range are represent with iterators and it
+is possible to use the new <code>std::error_code</code> as an alternative to exceptions.</p>
+
+<p>It is not require to work with array to use it, one can decide to use <code>std::vector&lt;&gt;</code>,
+<code>std::array&lt;&gt;</code>, <code>std::string&lt;&gt;</code> or anything which offer an iterator interface.</p>
 
 <h2>Design Decisions</h2>
 
