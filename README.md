@@ -5,12 +5,12 @@ is the `converter<>` class template which perform the conversion from an input e
 encoding. It is declare as follow:
 
 ```c++
-    template <
-        class FromCharT,
-        class FromEncoding,
-        class ToCharT,
-        class ToEncoding
-    > struct converter;
+template <
+    class FromCharT,
+    class FromEncoding,
+    class ToCharT,
+    class ToEncoding
+> struct converter;
 ```
 
 Instance of this function object provide an `operator()` that accept an input iterator range
@@ -18,14 +18,14 @@ Instance of this function object provide an `operator()` that accept an input it
 for the output encoding will be placed.
 
 ```c++
-    using namespace encoding;
-    
-    converter<char, utf8, std::uint32_t, utf32> conv;
-    
-    const char utf8_buffer[] = u8"Lorem ipsum";
-    std::vector<std::uint32_t> utf32_buffer;
-    
-    conv(std::begin(utf8_buffer), std::end(utf8_buffer), std::back_inserter(utf32_buffer));
+using namespace encoding;
+
+converter<char, utf8, std::uint32_t, utf32> conv;
+
+const char utf8_buffer[] = u8"Lorem ipsum";
+std::vector<std::uint32_t> utf32_buffer;
+
+conv(std::begin(utf8_buffer), std::end(utf8_buffer), std::back_inserter(utf32_buffer));
 ```
 
 Since the conversion of a string literal is a common task and tedious to write, an overload is
@@ -33,7 +33,7 @@ provide which replace the input iterator range is replace by a `const from_char_
 parameter. So the above example could have been simply write:
 
 ```c++
-    conv(u8"Lorem ipsum", std::back_inserter(utf32_buffer));
+conv(u8"Lorem ipsum", std::back_inserter(utf32_buffer));
 ```
 
 The default behaviour is to throw an exception if an error occure or if the operation result in a
@@ -71,12 +71,12 @@ become possible to write encoding independant classes such as `basic_string<Char
 letting an automatic conversion mechanism handle character and encoding differences.
 
 ```c++
-    using namespace encoding;
-    
-    basic_ostream<char, utf8>& out = get_ostream();
-    basic_string<std::uint32_t, utf32> str = U"Lorem ipsum";
-    
-    out << str; // automatic conversion from UTF-32 to UTF-8
+using namespace encoding;
+
+basic_ostream<char, utf8>& out = get_ostream();
+basic_string<std::uint32_t, utf32> str = U"Lorem ipsum";
+
+out << str; // automatic conversion from UTF-32 to UTF-8
 ```
 
 ### The possibility to use modern and standard practices
