@@ -48,11 +48,41 @@ I am working on this library with two main purpose:
 
 ### The possibility to add a new encoding easily
 
+To add a new encoding, let's say `iso_8859_1`, one simply need to provide specializations of the
+`converter<>` class from and to UTF-32. Other encoding will use those conversion to implement all
+other combinations.
+
 ### The possibility to optimize selected conversions
+
+The only requires conversion are from and to UTF-32, but one can decide to specialize other conversion
+to avoid the overhead of using UTF-32 as a buffer encoding. Thus, if the conversion from ISO 8859-1 to
+UTF-16 is a frequent operation, is worth specialize `converter<FromCharT, iso_8859_1, ToCharT, utf16>`
+to performe the direct conversion.
 
 ### The possibility to write generic code independant of the encoding
 
+If the encoding can be encode as a type and that we can choose the right conversion algorithm, it
+become possible to write encoding independant classes such as `basic_string<CharT, Encoding>`,
+`basic_istream<CharT, Encoding>` and `basic_ostream<CharT, Encoding>` and use them interchangeably,
+letting an automatic conversion mechanism handle character and encoding differences.
+
+```c++
+    using namespace encoding;
+    
+    basic_ostream<char, utf8>& out = get_ostream();
+    basic_string<std::uint32_t, utf32> str = U"Lorem ipsum";
+    
+    out << str; // automatic conversion from UTF-32 to UTF-8
+```
+
 ### The possibility to use modern and standard practices
+
+The library massively use template to enable as much interoperability as possible: character type
+is a template, encoding is represent as a tag template, range are represent with iterators and it
+is possible to use the new `std::error_code` as an alternative to exceptions.
+
+It is not require to work with array to use it, one can decide to use `std::vector<>`,
+`std::array<>`, `std::string<>` or anything which offer an iterator interface.
 
 ## Design Decisions
 
