@@ -42,8 +42,8 @@ parameter where the corresponding error code will be place.
 
 ## Motivation and Scope
 
-I am working on this library for two main purpose:
-- Learning about unicode encoding and libary design.
+I am working on this library with two main purpose:
+- Learn about unicode encoding and libary design.
 - Try to get a simple libary that offer many possibilities for modern C++ development.
 
 ### The possibility to add a new encoding easily
