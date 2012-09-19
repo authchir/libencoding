@@ -33,9 +33,57 @@
       <section id="main_content" class="inner">
         <h2>Introduction</h2>
 
-<p>libencoding aims to provide a generic and extensible encoding conversion library.</p>
+<p>libencoding aims to provide a generic and extensible encoding conversion library. It's main component
+is the <code>converter&lt;&gt;</code> class template which perform the conversion from an input encoding to an output
+encoding. It is declare as follow:</p>
+
+<div class="highlight"><pre>    <span class="k">template</span> <span class="o">&lt;</span>
+        <span class="k">class</span> <span class="nc">FromCharT</span><span class="p">,</span>
+        <span class="k">class</span> <span class="nc">FromEncoding</span><span class="p">,</span>
+        <span class="k">class</span> <span class="nc">ToCharT</span><span class="p">,</span>
+        <span class="k">class</span> <span class="nc">ToEncoding</span>
+    <span class="o">&gt;</span> <span class="k">struct</span> <span class="n">converter</span><span class="p">;</span>
+</pre></div>
+
+<p>Instance of this function object provide an <code>operator()</code> that accept an input iterator range
+<code>[first, last)</code> of character type for the input encoding and an output iterator where character type
+for the output encoding will be placed.</p>
+
+<div class="highlight"><pre>    <span class="k">using</span> <span class="k">namespace</span> <span class="n">encoding</span><span class="p">;</span>
+
+    <span class="n">converter</span><span class="o">&lt;</span><span class="kt">char</span><span class="p">,</span> <span class="n">utf8</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">uint32_t</span><span class="p">,</span> <span class="n">utf32</span><span class="o">&gt;</span> <span class="n">conv</span><span class="p">;</span>
+
+    <span class="k">const</span> <span class="kt">char</span> <span class="n">utf8_buffer</span><span class="p">[]</span> <span class="o">=</span> <span class="n">u8</span><span class="s">"Lorem ipsum"</span><span class="p">;</span>
+    <span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">uint32_t</span><span class="o">&gt;</span> <span class="n">utf32_buffer</span><span class="p">;</span>
+
+    <span class="n">conv</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">begin</span><span class="p">(</span><span class="n">utf8_buffer</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">end</span><span class="p">(</span><span class="n">utf8_buffer</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">back_inserter</span><span class="p">(</span><span class="n">utf32_buffer</span><span class="p">));</span>
+</pre></div>
+
+<p>Since the conversion of a string literal is a common task and tedious to write, an overload is
+provide which replace the input iterator range is replace by a <code>const from_char_type (&amp;)[N]</code>
+parameter. So the above example could have been simply write:</p>
+
+<div class="highlight"><pre>    <span class="n">conv</span><span class="p">(</span><span class="n">u8</span><span class="s">"Lorem ipsum"</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">back_inserter</span><span class="p">(</span><span class="n">utf32_buffer</span><span class="p">));</span>
+</pre></div>
+
+<p>The default behaviour is to throw an exception if an error occure or if the operation result in a
+partial conversion. For a fine grain error handling, an overload is provide with a <code>std::error_code&amp;</code>
+parameter where the corresponding error code will be place.</p>
 
 <h2>Motivation and Scope</h2>
+
+<p>I am working on this library for two main purpose:</p>
+
+<ul>
+<li>Learning about unicode encoding and libary design.</li>
+<li>Try to get a simple libary that offer many possibilities for modern C++ development.</li>
+</ul><h3>The possibility to add a new encoding easily</h3>
+
+<h3>The possibility to optimize selected conversions</h3>
+
+<h3>The possibility to write generic code independant of the encoding</h3>
+
+<h3>The possibility to use modern and standard practices</h3>
 
 <h2>Design Decisions</h2>
 
@@ -95,8 +143,12 @@
     <span class="p">{</span>
     <span class="p">};</span>
 
-    <span class="k">template</span><span class="o">&lt;</span><span class="k">class</span> <span class="nc">FromCharT</span><span class="p">,</span> <span class="k">class</span> <span class="nc">FromEncoding</span><span class="p">,</span> <span class="k">class</span> <span class="nc">ToCharT</span><span class="p">,</span> <span class="k">class</span> <span class="nc">ToEncoding</span><span class="o">&gt;</span>
-    <span class="k">struct</span> <span class="n">converter</span>
+    <span class="k">template</span> <span class="o">&lt;</span>
+        <span class="k">class</span> <span class="nc">FromCharT</span><span class="p">,</span>
+        <span class="k">class</span> <span class="nc">FromEncoding</span><span class="p">,</span>
+        <span class="k">class</span> <span class="nc">ToCharT</span><span class="p">,</span>
+        <span class="k">class</span> <span class="nc">ToEncoding</span>
+    <span class="o">&gt;</span> <span class="k">struct</span> <span class="n">converter</span>
     <span class="p">{</span>
         <span class="k">typedef</span> <span class="n">FromCharT</span>    <span class="n">from_char_type</span><span class="p">;</span>
         <span class="k">typedef</span> <span class="n">FromEncoding</span> <span class="n">from_encoding</span><span class="p">;</span>
